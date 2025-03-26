@@ -106,6 +106,7 @@ output "bucket_name" {
    - Auto-assign Public IP: Enable
    - IAM role: Select "EC2Admin"
      ![default](images/default.png)
+
      ![EC2Admin-role](images/EC2Admin-role.png)
 
 6. Keep default storage settings.
@@ -118,3 +119,31 @@ output "bucket_name" {
 
 9. Review and launch, selecting or creating a key pair.
    ![sucess](images/sucess.png)
+
+### Step 4: Connect to EC2 Instance and Install Terraform
+
+1. From the EC2 dashboard, select your "workstation" instance.
+   ![select](images/select.png)
+
+2. Click "Connect" and use the "EC2 Instance Connect" method.
+   ![connect](images/connect1.png)
+
+   ![connect](images/connect2.png)
+
+3. In the browser-based SSH session, update system packages:
+   `sudo yum update -y`
+
+4. Install yum-utils:
+   `sudo yum install -y yum-utils`
+   ![install](images/install.png)
+
+5. Add HashiCorp repository:
+   `sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo`
+
+6. Install Terraform:
+   `sudo yum -y install terraform`
+   ![install](images/install2.png)
+
+7. Verify installation:
+   `terraform version`
+   ![Terraform version](images/terraform-version.png)
