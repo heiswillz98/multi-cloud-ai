@@ -213,3 +213,71 @@ output "bucket_name" {
 
 8. Type "yes" when prompted to create the resources.
    ![terraform appy](images/terraform-apply-s3.png)
+
+### Step 6: Verify S3 Bucket Creation
+
+1. Use AWS CLI to list buckets:
+
+```hcl
+aws s3 ls
+```
+
+![aws s3 ls](images/aws-s3-ls.png)
+
+2. Verify that your new bucket is in the list.
+
+### Step 7: Create the Cloud DynamoDB tables
+
+Remove the S3 lines and add the lines below to create the DynamoDB tables used by CloudMart
+
+```hcl
+  provider "aws" {
+  region = "us-east-1"
+}
+
+# Tables DynamoDB
+resource "aws_dynamodb_table" "cloudmart_products" {
+  name           = "cloudmart-products"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "cloudmart_orders" {
+  name           = "cloudmart-orders"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "cloudmart_tickets" {
+  name           = "cloudmart-tickets"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+}
+```
+
+1. Apply the configuration:
+
+```hcl
+terraform apply
+```
+
+![aws db](images/terraform-apply-db.png)
+
+2. Type "yes" when prompted to create the resources.
+
+Congratulations! You've successfully used Claude to generate Terraform code, set up an EC2 workstation, installed Terraform, and created an S3 bucket. This completes Day 1 of the MultiCloud DevOps & AI Challenge.
