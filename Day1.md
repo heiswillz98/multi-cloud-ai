@@ -64,10 +64,24 @@ output "bucket_name" {
 
 . Save this code for use in Step 5
 
-### Step 1: Create IAM Role for EC2
+### Step 2: Create IAM Role for EC2
 
 1. Log in to the AWS Management Console.
    ![AWS Console Login](images/login.png)
 
 2. Navigate to the IAM dashboard.
    ![IAM Dashboard](images/iam-dashboard.png)
+
+3. Click "Roles" in the left sidebar, then "Create role".
+   ![Create Role](images/roles.png)
+
+4. Choose "AWS service" as the trusted entity type and "EC2" as the use case.
+   ![AWS Servive](images/aws-service.png)
+
+5. Search for and attach the "AdministratorAccess" policy
+   ![Attach Policy](images/AdministratorAccess.png)
+   Note: In a production environment, use a more restricted policy.
+
+6. Name the role "EC2Admin" and provide a description.
+   ![Role Name](images/Ec2Admin.png)
+   Review and create the role.
