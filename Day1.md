@@ -85,3 +85,36 @@ output "bucket_name" {
 6. Name the role "EC2Admin" and provide a description.
    ![Role Name](images/Ec2Admin.png)
    Review and create the role.
+
+### Step 3: Launch EC2 Instance
+
+1. Go to the EC2 dashboard in the AWS Management Console.
+
+2. Click "Launch Instance".
+   ![Launch Instance](images/ec2dashboard.png)
+
+3. Choose an Amazon Linux 2 AMI.
+   ![AMI](images/ami.png)
+
+4. Select a t2.micro instance type.
+   ![t2](images/t2.png)
+
+5. Configure instance details:
+
+   - Network: Default VPC
+   - Subnet: Any available
+   - Auto-assign Public IP: Enable
+   - IAM role: Select "EC2Admin"
+     ![default](images/default.png)
+     ![EC2Admin-role](images/EC2Admin-role.png)
+
+6. Keep default storage settings.
+
+7. Add a tag: Key="Name", Value="workstation".
+   ![tag](images/tag.png)
+
+8. Create a security group allowing SSH access from EC2 Connect IP.
+   ![security](images/sg.png)
+
+9. Review and launch, selecting or creating a key pair.
+   ![sucess](images/sucess.png)
