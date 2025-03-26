@@ -61,3 +61,13 @@ output "bucket_name" {
   value = aws_s3_bucket.example_bucket.id
 }
 ```
+
+. Save this code for use in Step 5
+
+### Step 1: Create IAM Role for EC2
+
+1. Log in to the AWS Management Console.
+   ![AWS Console Login](images/login.png)
+
+2. Navigate to the IAM dashboard.
+   ![IAM Dashboard](images/iam-dashboard.png)
