@@ -1,8 +1,4 @@
-# MultiCloud, DevOps & AI Challenge - Day 1 - Experienced
-
-<aside>
-💡 Remember to use the class replay as a reference.
-</aside>
+# MultiCloud, DevOps & AI Challenge - Day 1
 
 ## Streamlined Guide: Using Claude as AI Assistant to Terraform
 
