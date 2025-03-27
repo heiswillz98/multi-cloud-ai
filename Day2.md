@@ -110,3 +110,89 @@ ENV NODE_ENV=production
 EXPOSE 5001
 CMD ["serve", "-s", ".", "-l", "5001"]
 ```
+
+## Part 2 - Kubernetes
+
+```
+Attention: AWS Kubernetes service is not free, so when executing the hands-on below, you will be charged a few cents on your AWS account according to EKS pricing on AWS.
+
+Remember to delete the cluster to avoid unwanted charges. Use the removal section at the end of the doc.
+```
+
+### Cluster Setup on AWS Elastic Kubernetes Services (EKS)
+
+1. Create a user named eksuser with Admin privileges and authenticate with it
+
+```hcl
+aws configure
+```
+
+![AWS Configure](images/aws-configure.png)
+
+2.Install the CLI tool eksctl
+
+```hcl
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo cp /tmp/eksctl /usr/bin
+eksctl version
+```
+
+3. Install the CLI tool kubectl
+
+```hcl
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+kubectl version --short --client
+```
+
+![Install Kube](images/install-kube.png)
+
+4. Create an EKS Cluster
+
+```hcl
+eksctl create cluster \
+  --name cloudmart \
+  --region us-east-1 \
+  --nodegroup-name standard-workers \
+  --node-type t3.medium \
+  --nodes 1 \
+  --with-oidc \
+  --managed
+```
+
+![Create Eks](images/eks-success.png)
+
+5. Connect to the EKS cluster using the kubectl configuration
+
+```hcl
+aws eks update-kubeconfig --name cloudmart
+```
+
+6. Verify Cluster Connectivity
+
+```hcl
+kubectl get svc
+kubectl get nodes
+```
+
+![Eks Update](images/eks-updates.png)
+
+7. Create a Role & Service Account to provide pods access to services used by the application (DynamoDB, Bedrock, etc).
+
+```hcl
+eksctl create iamserviceaccount \
+  --cluster=cloudmart \
+  --name=cloudmart-pod-execution-role \
+  --role-name CloudMartPodExecutionRole \
+  --attach-policy-arn=arn:aws:iam::aws:policy/AdministratorAccess\
+  --region us-east-1 \
+  --approve
+```
+
+![Eksctl Service](images/eksctl-service.png)
+
+```
+NOTE: In the example above, Admin privileges were used to facilitate educational purposes. Always remember to follow the principle of least privilege in production environments
+```
