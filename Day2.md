@@ -375,6 +375,14 @@ kubectl get service
 
 ![K8S](images/kubectl-apply-frontend.png)
 
+Check the Loadbalancer on the AWS Page and access our application
+
+![Page](images/landing1.png)
+![Page](images/landing2.png)
+![Page](images/landing3.png)
+![Page](images/landing4.png)
+![Page](images/landing5.png)
+
 ## Removal
 
 At the end of the hands-on, delete all resources:
