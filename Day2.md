@@ -69,3 +69,44 @@ COPY . .
 EXPOSE 5000
 CMD ["npm", "start"]
 ```
+
+![DockerFile](images/dockerfile-backend.png)
+
+### Frontend
+
+1. Create folder and download source code:
+
+```hcl
+cd ..
+mkdir frontend && cd frontend
+wget https://tcb-public-events.s3.amazonaws.com/mdac/resources/day2/cloudmart-frontend.zip
+unzip cloudmart-frontend.zip
+```
+
+![mkdir](images/mkdir-frontend.png)
+
+2. Create Dockerfile:
+
+```hcl
+nano Dockerfile
+```
+
+Content of Dockerfile:
+
+```hcl
+FROM node:16-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:16-alpine
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=build /app/dist /app
+ENV PORT=5001
+ENV NODE_ENV=production
+EXPOSE 5001
+CMD ["serve", "-s", ".", "-l", "5001"]
+```
