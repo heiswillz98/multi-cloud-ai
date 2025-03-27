@@ -113,11 +113,9 @@ CMD ["serve", "-s", ".", "-l", "5001"]
 
 ## Part 2 - Kubernetes
 
-```
 Attention: AWS Kubernetes service is not free, so when executing the hands-on below, you will be charged a few cents on your AWS account according to EKS pricing on AWS.
 
 Remember to delete the cluster to avoid unwanted charges. Use the removal section at the end of the doc.
-```
 
 ### Cluster Setup on AWS Elastic Kubernetes Services (EKS)
 
@@ -193,6 +191,99 @@ eksctl create iamserviceaccount \
 
 ![Eksctl Service](images/eksctl-service.png)
 
-```
 NOTE: In the example above, Admin privileges were used to facilitate educational purposes. Always remember to follow the principle of least privilege in production environments
+
+## Backend Deployment on Kubernetes
+
+1. Create an ECR Repository for the Backend and upload the Docker image to it
+
+```hcl
+Repository name: cloudmart-backend
 ```
+
+![ECR](images/ecr.png)
+![ECR](images/ecr-backend-success.png)
+
+2. Switch to backend folder
+
+```hcl
+cd ../..
+cd challenge-day2/backend
+```
+
+3. Follow the ECR steps to build your Docker image
+   ![ECR](images/backend-pushcommand.png)
+
+4. Create a Kubernetes deployment file (YAML) for the Backend
+
+```hcl
+cd ../..
+cd challenge-day2/backend
+nano cloudmart-backend.yaml
+```
+
+```hcl
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudmart-backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudmart-backend-app
+  template:
+    metadata:
+      labels:
+        app: cloudmart-backend-app
+    spec:
+      serviceAccountName: cloudmart-pod-execution-role
+      containers:
+      - name: cloudmart-backend-app
+        image: public.ecr.aws/l4c0j8h9/cloudmart-backend:latest
+        env:
+        - name: PORT
+          value: "5000"
+        - name: AWS_REGION
+          value: "us-east-1"
+        - name: BEDROCK_AGENT_ID
+          value: "xxxxxx"
+        - name: BEDROCK_AGENT_ALIAS_ID
+          value: "xxxx"
+        - name: OPENAI_API_KEY
+          value: "xxxxxx"
+        - name: OPENAI_ASSISTANT_ID
+          value: "xxxx"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudmart-backend-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloudmart-backend-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+```
+
+![K8S](images/k8s-yaml-backend.png)
+
+5. Deploy the Backend on Kubernetes
+
+```hcl
+kubectl apply -f cloudmart-backend.yaml
+```
+
+6. Monitor the status of objects being created and obtain the public IP generated for the API
+
+```hcl
+kubectl get pods
+kubectl get deployment
+kubectl get service
+```
+
+![K8S](images/kubectl-apply-backend.png)
