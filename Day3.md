@@ -99,3 +99,11 @@ Add the permission AmazonElasticContainerRegistryPublicFullAccess.
 ![Codepipeline](images/cloudbuild-role.png)
 ![Codepipeline](images/policy.png)
 ![Codepipeline](images/permission.png)
+
+6. Configure AWS CodeBuild for Application Deployment
+   Create a Deployment Project:
+   Repeat the process of creating projects in CodeBuild.
+   Give this project a different name (for example, cloudmartDeployToProduction).
+   Configure the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for the credentials of the user eks-user in Cloud Build, so it can authenticate to the Kubernetes cluster.
+
+Note: in a real-world production environment, it is recommended to use an IAM role for this purpose. In this practical exercise, we are directly using the credentials of the eks-user to facilitate the process, since our focus is on CI/CD and not on user authentication at this moment. The configuration of this process in EKS is more extensive. Refer to the Reference section and check "Enabling IAM principal access to your cluster"
