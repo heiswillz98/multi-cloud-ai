@@ -99,6 +99,7 @@ Add the permission AmazonElasticContainerRegistryPublicFullAccess.
 ![Codepipeline](images/cloudbuild-role.png)
 ![Codepipeline](images/policy.png)
 ![Codepipeline](images/permission.png)
+![Codepipeline](images/pipeline-build-success.png)
 
 6. Configure AWS CodeBuild for Application Deployment
    Create a Deployment Project:
@@ -107,3 +108,75 @@ Add the permission AmazonElasticContainerRegistryPublicFullAccess.
    Configure the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for the credentials of the user eks-user in Cloud Build, so it can authenticate to the Kubernetes cluster.
 
 Note: in a real-world production environment, it is recommended to use an IAM role for this purpose. In this practical exercise, we are directly using the credentials of the eks-user to facilitate the process, since our focus is on CI/CD and not on user authentication at this moment. The configuration of this process in EKS is more extensive. Refer to the Reference section and check "Enabling IAM principal access to your cluster"
+
+For the deployment specification, use the following buildspec.yml:
+
+```hcl
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 20
+    commands:
+      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - mv ./kubectl /usr/local/bin
+      - kubectl version --short --client
+  post_build:
+    commands:
+      - aws eks update-kubeconfig --region us-east-1 --name cloudmart
+      - kubectl get nodes
+      - ls
+      - IMAGE_URI=$(jq -r '.[0].imageUri' imagedefinitions.json)
+      - echo $IMAGE_URI
+      - sed -i "s|CONTAINER_IMAGE|$IMAGE_URI|g" cloudmart-frontend.yaml
+      - kubectl apply -f cloudmart-frontend.yaml
+
+```
+
+![Codepipeline](images/add-stage.png)
+![Codepipeline](images/add-stage3.png)
+![Codepipeline](images/add-stage2.png)
+![Codepipeline](images/new-project.png)
+![Codepipeline](images/pipeline-update.png)
+![Codepipeline](images/code-deploy.png)
+
+7. Replace the image URI on line 18 of the cloudmart-frontend.yaml files with CONTAINER_IMAGE.
+   ![Codepipeline](images/edit-frontend.png)
+
+Commit and push the changes.
+
+```hcl
+git add -A
+git commit -m "replaced image uri with CONTAINER_IMAGE"
+git push
+```
+
+### Part 2: Test your CI/CD Pipeline
+
+1. Make a Change on GitHub:
+   Update the application code in the cloudmart-application repository.
+   File src/components/MainPage/index.jsx line 93
+   Commit and push the changes.
+
+```hcl
+git add -A
+git commit -m "changed to Featured Products on CloudMart"
+git push
+```
+
+![Codepipeline](images/edit-frontend2.png)
+
+2. Observe the Pipeline Execution:
+   Watch how CodePipeline automatically triggers the build.
+   After the build, the deployment phase should begin.
+   Update AWSCodePipelineServiceRole-us-west-2-cloudmart-cicd-pipeline permision with AWSCodeBuildAdminAccess
+   ![Codepipeline](images/codepermision.png)
+   ![Codepipeline](images/deployed.png)
+   ![Codepipeline](images/pipeline-succ.png)
+   ![Codepipeline](images/pipeline-succeded.png)
+
+3. Verify the Deployment:
+   Check Kubernetes using kubectl commands to confirm the application update.
+   ![Codepipeline](images/cloudmart-update.png)
