@@ -294,3 +294,15 @@ Verify that the new policy is attached to the role.
 
 ![Github](images/prep-agent.png)
 ![Github](images/prep-agent2.png)
+
+## Create an Alias for the Agent:
+
+1. On the agent details page, go to the "Aliases" section.
+2. Click on "Create alias".
+3. Name the alias "cloudmart-prod".
+4. Select the most recent version of the agent.
+5. Click on "Create alias" to finalize.
+
+Note: Make sure that the Lambda function name in the IAM policy matches the actual name of your function and adjust the region in the ARNs if you're not using us-east-1.
+![Github](images/create-alias.png)
+![Github](images/alias-created.png)
