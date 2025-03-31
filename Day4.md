@@ -306,3 +306,119 @@ Verify that the new policy is attached to the role.
 Note: Make sure that the Lambda function name in the IAM policy matches the actual name of your function and adjust the region in the ARNs if you're not using us-east-1.
 ![Github](images/create-alias.png)
 ![Github](images/alias-created.png)
+
+# OpenAI Assistant Configuration
+
+Follow these steps to create an OpenAI assistant for CloudMart:
+
+## OpenAI Access:
+
+1. Access the OpenAI platform (https://platform.openai.com/).
+2. Log in or create an account if you don't have one yet.
+
+## Create the Assistant:
+
+1. Navigate to the "Assistants" section.
+2. Click on "Create New Assistant".
+3. Name the assistant "CloudMart Customer Support".
+4. Select the model `gpt-4o`.
+
+## Configure the Assistant:
+
+1. In the "Instructions" section, paste the following:
+
+   ```hcl
+   You are a customer support agent for CloudMart, an e-commerce platform. Your role is to assist customers with general inquiries, order issues, and provide helpful information about using the CloudMart platform. You don't have direct access to specific product or inventory information. Always be polite, patient, and focus on providing excellent customer service. If a customer asks about specific products or inventory, politely explain that you don't have access to that information and suggest they check the website or speak with a sales representative.
+   ```
+
+2. In "Capabilities", you can enable "Code Interpreter" if you want the assistant to help with technical aspects of using the platform.
+
+## Save the Assistant:
+
+1. After creating the assistant it is going to auto-save.
+2. Note down the Assistant ID, you'll need it for your environment variables.
+
+## Generate API Key:
+
+1. Go to the API Keys section in your OpenAI account.
+2. Generate a new API key.
+3. Copy this key, you'll need it for your environment variables.
+
+# Redeploy the backend with AI Assistants
+
+## Update the `cloudmart-backend.yaml` file with AI Assistants information
+
+Open the `cloudmart-backend.yaml` file:
+
+```hcl
+nano cloudmart-backend.yaml
+```
+
+Content of cloudmart-backend.yaml:
+
+```hcl
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudmart-backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudmart-backend-app
+  template:
+    metadata:
+      labels:
+        app: cloudmart-backend-app
+    spec:
+      serviceAccountName: cloudmart-pod-execution-role
+      containers:
+      - name: cloudmart-backend-app
+        image: public.ecr.aws/l4c0j8h9/cloudmaster-backend:latest
+        env:
+        - name: PORT
+          value: "5000"
+        - name: AWS_REGION
+          value: "us-east-1"
+        - name: BEDROCK_AGENT_ID
+          value: "xxxx"
+        - name: BEDROCK_AGENT_ALIAS_ID
+          value: "xxxx"
+        - name: OPENAI_API_KEY
+          value: "xxxx"
+        - name: OPENAI_ASSISTANT_ID
+          value: "xxxx"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudmart-backend-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloudmart-backend-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+```
+
+Update the deployment in Kubernetes
+
+```hcl
+kubectl apply -f cloudmart-backend.yaml
+```
+
+Test the AI Assistant
+
+![Github](images/pretest.png)
+![Github](images/test.png)
+![Github](images/test1.png)
+![Github](images/test2.png)
+![Github](images/test3.png)
+![Github](images/test4.png)
+![Github](images/test5.png)
+![Github](images/pendingOrder.png)
+![Github](images/cstest.png)
+![Github](images/canceledOrder.png)
